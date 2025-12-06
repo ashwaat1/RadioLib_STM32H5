@@ -39,6 +39,15 @@ void my_pinMode(uint32_t pin, uint32_t mode){
     HAL_GPIO_Init(pinMap_Port[pin], &GPIO_InitStruct);
 }
 
+void my_digitalWrite(uint32_t pin, uint32_t value){
+    HAL_GPIO_WritePin(pinMap_Port[pin], pinMap_Pin[pin], (value == GPIO_HIGH_LEVEL) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+uint32_t my_digitalRead(uint32_t pin){
+    GPIO_PinState st = HAL_GPIO_ReadPin(pinMap_Port[pin], pinMap_Pin[pin]);
+    return (st == GPIO_PIN_SET) ? GPIO_HIGH_LEVEL : GPIO_LOW_LEVEL;    
+}
+
 void my_attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode){
     // Set callback function
     irqCallbacks[interruptNum] = interruptCb;

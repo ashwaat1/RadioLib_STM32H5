@@ -30,17 +30,14 @@ public:
     if (pin == RADIOLIB_NC) {
         return;
     }    
-    
-    HAL_GPIO_WritePin(pinMap_Port[pin], pinMap_Pin[pin], (value == GPIO_HIGH_LEVEL) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    my_digitalWrite(pin, value);
   }
 
   uint32_t digitalRead(uint32_t pin) override {
     if (pin == RADIOLIB_NC) {
         return 0;
     }
-
-    GPIO_PinState st = HAL_GPIO_ReadPin(pinMap_Port[pin], pinMap_Pin[pin]);
-    return (st == GPIO_PIN_SET) ? GPIO_HIGH_LEVEL : GPIO_LOW_LEVEL; 
+    return my_digitalRead(pin);
   }
 
   void attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32_t mode) override {
@@ -55,6 +52,7 @@ public:
     if (interruptNum == RADIOLIB_NC) {
       return;
     }
+
     my_detachInterrupt(interruptNum);
   }
 
