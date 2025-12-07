@@ -18,9 +18,26 @@ RF69 radio = new Module(hal, PA_10, PB_6, PB_7);
 extern "C" {
 
 void RadioLib_Init(void) {
+
+    // Module* rf69_mod = radio.getMod();
+
+    // printf_dma("My SPI checks:\n");
+
+    // int version_spi = rf69_mod->SPIgetRegValue(RADIOLIB_RF69_REG_VERSION);
+    // printf_dma("Version: %d\n", version_spi);
+
+    // int mode_spi = rf69_mod->SPIgetRegValue(RADIOLIB_RF69_REG_OP_MODE);
+    // printf_dma("Mode: %d\n", mode_spi);; 
+
+    // printf_dma("Setting automatic sequencer %d\n", rf69_mod->SPIsetRegValue(RADIOLIB_RF69_REG_OP_MODE, RADIOLIB_RF69_SEQUENCER_ON, 7, 7));
+    // HAL_Delay(1);
+    // printf_dma("Setting mode to STBY : %d", rf69_mod->SPIsetRegValue(RADIOLIB_RF69_REG_OP_MODE, RADIOLIB_RF69_STANDBY, 4, 2));
+    // HAL_Delay(1);
+    // printf_dma("Version: %d Mode: %d\n", rf69_mod->SPIgetRegValue(RADIOLIB_RF69_REG_VERSION), rf69_mod->SPIgetRegValue(RADIOLIB_RF69_REG_OP_MODE)); 
+
     // initialize RF69
     printf_dma("[RF69] Initializing ... ");
-    int state = radio.begin(868.0, 300.0, 60.0, 250.0, 17, 32);
+    int state = radio.begin();
     if (state == RADIOLIB_ERR_NONE) {
         printf_dma("success!\n");
     } else {
@@ -28,36 +45,60 @@ void RadioLib_Init(void) {
         while (true) { }
     }
 
-    // Set sync word
-    uint8_t syncWord[] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
-    if (radio.setSyncWord(syncWord, 8) == RADIOLIB_ERR_INVALID_SYNC_WORD) {
-        printf_dma("[RF69] Selected sync word is invalid for this module!\n");
+    state = radio.setFrequency(915.0);
+    if (state == RADIOLIB_ERR_NONE) {
+        printf_dma("frequency success!\n");
+    } else {
+        printf_dma("failed, code %d\n", state);
         while (true) { }
     }
-    printf_dma("[RF69] All settings changed successfully!\n");
+
+    state = radio.setBitRate(4.8);
+    if (state == RADIOLIB_ERR_NONE) {
+        printf_dma("bitrate success!\n");
+    } else {
+        printf_dma("failed, code %d\n", state);
+        while (true) { }
+    }
+
+    state = radio.setFrequencyDeviation(5.0);
+    if (state == RADIOLIB_ERR_NONE) {
+        printf_dma("deviation success!\n");
+    } else {
+        printf_dma("failed, code %d\n", state);
+        while (true) { }
+    }
+
+    state = radio.setOutputPower(15.0, true);
+    if (state == RADIOLIB_ERR_NONE) {
+        printf_dma("power success!\n");
+    } else {
+        printf_dma("failed, code %d\n", state);
+        while (true) { }
+    }
 }
 
 void RadioLib_Loop(void) {
-    printf_dma("[RF69] Waiting for incoming transmission ... ");
+    int16_t version = radio.getChipVersion();
+    printf_dma("Chip version is %d\n", version);
 
-    // receive data as byte array
-    uint8_t byteArr[8];
-    int state = radio.receive(byteArr, 8, 1000);
+    float freq_read = -1.0;
+    int freq_status = radio.getFrequency(&freq_read);
+    printf_dma("Frequency is %d status %d\n", (int)freq_read, freq_status);
+
+    char str[] = "Hello World!";
+    int state = radio.transmit(str);
 
     if (state == RADIOLIB_ERR_NONE) {
-        // packet was successfully received
-        printf_dma("success!\n[RF69] Data: %d %d %d %d RSSI: %f dBm\n",  
-                    byteArr[0], byteArr[1], byteArr[2], byteArr[3], radio.getRSSI());
-    } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
-        // timeout occurred while waiting for a packet
-        printf_dma("timeout!\n");
-    } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-        // packet was received, but is malformed
-        printf_dma("CRC error!\n");
+        // the packet was successfully transmitted
+        printf_dma("success!\n");
     } else {
         // some other error occurred
         printf_dma("failed, code %d\n", state);
     }
+
+    while(1){}
+
 }
 
 

@@ -15,28 +15,28 @@ void DWT_Init(void) {
 }
 
 void my_pinMode(uint32_t pin, uint32_t mode){
-    switch((int) pinMap_Port[pin])
-    {
-        case GPIOA_BASE_NS:
-          __HAL_RCC_GPIOA_CLK_ENABLE();
-          break;
-        case GPIOB_BASE_NS:
-          __HAL_RCC_GPIOB_CLK_ENABLE();
-          break;
-        case GPIOC_BASE_NS:
-          __HAL_RCC_GPIOC_CLK_ENABLE();
-          break;
-        default:
-          return;
-    }
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin   = pinMap_Pin[pin];
-    GPIO_InitStruct.Mode  = mode;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    if (mode == GPIO_OUT){
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    }
-    HAL_GPIO_Init(pinMap_Port[pin], &GPIO_InitStruct);
+    // switch((int) pinMap_Port[pin])
+    // {
+    //     case GPIOA_BASE_NS:
+    //       __HAL_RCC_GPIOA_CLK_ENABLE();
+    //       break;
+    //     case GPIOB_BASE_NS:
+    //       __HAL_RCC_GPIOB_CLK_ENABLE();
+    //       break;
+    //     case GPIOC_BASE_NS:
+    //       __HAL_RCC_GPIOC_CLK_ENABLE();
+    //       break;
+    //     default:
+    //       return;
+    // }
+    // GPIO_InitTypeDef GPIO_InitStruct = {0};
+    // GPIO_InitStruct.Pin   = pinMap_Pin[pin];
+    // GPIO_InitStruct.Mode  = mode;
+    // GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    // if (mode == GPIO_OUT){
+    //     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    // }
+    // HAL_GPIO_Init(pinMap_Port[pin], &GPIO_InitStruct);
 }
 
 void my_digitalWrite(uint32_t pin, uint32_t value){
@@ -52,26 +52,26 @@ void my_attachInterrupt(uint32_t interruptNum, void (*interruptCb)(void), uint32
     // Set callback function
     irqCallbacks[interruptNum] = interruptCb;
     // Configure pin to external interrupt mode
-    switch((int) pinMap_Port[interruptNum])
-    {
-        case GPIOA_BASE_NS:
-          __HAL_RCC_GPIOA_CLK_ENABLE();
-          break;
-        case GPIOB_BASE_NS:
-          __HAL_RCC_GPIOB_CLK_ENABLE();
-          break;
-        case GPIOC_BASE_NS:
-          __HAL_RCC_GPIOC_CLK_ENABLE();
-          break;
-        default:
-          return;
-    }    
+    // switch((int) pinMap_Port[interruptNum])
+    // {
+    //     case GPIOA_BASE_NS:
+    //       __HAL_RCC_GPIOA_CLK_ENABLE();
+    //       break;
+    //     case GPIOB_BASE_NS:
+    //       __HAL_RCC_GPIOB_CLK_ENABLE();
+    //       break;
+    //     case GPIOC_BASE_NS:
+    //       __HAL_RCC_GPIOC_CLK_ENABLE();
+    //       break;
+    //     default:
+    //       return;
+    // }    
 
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin  = pinMap_Pin[interruptNum];
-    GPIO_InitStruct.Mode = mode;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(pinMap_Port[interruptNum], &GPIO_InitStruct);
+    // GPIO_InitTypeDef GPIO_InitStruct = {0};
+    // GPIO_InitStruct.Pin  = pinMap_Pin[interruptNum];
+    // GPIO_InitStruct.Mode = mode;
+    // GPIO_InitStruct.Pull = GPIO_NOPULL;
+    // HAL_GPIO_Init(pinMap_Port[interruptNum], &GPIO_InitStruct);
 
     // Enable EXTI IRQ in NVIC
     IRQn_Type irqn = get_exti_irqn_from_pinMask(pinMap_Pin[interruptNum]);
